@@ -64,15 +64,123 @@ UTimage.src = 'utaluxart-12_3.jpg';
 	<br>	
     <canvas id="myCanvas" width=360 height=450 style="border:1px solid #d3d3d3;"></canvas>
       
-	<script> /* This script initiates the cavas and puts the text on the canvas "myCanvas" */
+	<script> /* This script initiates the cavas and draws a dinosaur on the "myCanvas" */
         var canvas = document.getElementById('myCanvas');
-        var context = canvas.getContext("2d");
-        context.font = '20pt Calibri';
-        context.fillStyle = "black";
-        context.fillText("Original image will go here", 10, 20);
-		context.drawImage(UTimage, 0, 0, UTimage.width, UTimage.height,     // source rectangle
-                   0, 0, canvas.width, canvas.height); // destination rectangle
-		
+        var ctx = canvas.getContext('2d');
+
+        function drawDino() {
+            // clear and soft background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fdf6fb';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Body (ellipse) - pink
+            ctx.save();
+            ctx.translate(180, 240);
+            ctx.scale(1.4, 1);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 80, 45, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#FF6FA3'; // main pink
+            ctx.fill();
+            ctx.restore();
+
+            // Tail (curved shape) - darker pink
+            ctx.beginPath();
+            ctx.moveTo(100, 240);
+            ctx.quadraticCurveTo(60, 200, 40, 220);
+            ctx.quadraticCurveTo(60, 240, 60, 260);
+            ctx.closePath();
+            ctx.fillStyle = '#D14C7A'; // tail pink
+            ctx.fill();
+            ctx.strokeStyle = '#7A1F3A'; // dark pink stroke
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Legs (two chunky legs) - medium pink
+            function drawLeg(x, y) {
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.quadraticCurveTo(x - 12, y + 30, x + 6, y + 50);
+                ctx.quadraticCurveTo(x + 22, y + 30, x + 10, y);
+                ctx.closePath();
+                ctx.fillStyle = '#F05A8F';
+                ctx.fill();
+                ctx.strokeStyle = '#7A1F3A';
+                ctx.stroke();
+                // toes
+                ctx.fillStyle = '#7A1F3A';
+                ctx.fillRect(x - 4, y + 48, 10, 4);
+            }
+            drawLeg(145, 270);
+            drawLeg(205, 270);
+
+            // Neck and head - same main pink
+            ctx.beginPath();
+            ctx.moveTo(230, 210);
+            ctx.quadraticCurveTo(245, 175, 275, 170);
+            ctx.quadraticCurveTo(300, 167, 310, 185);
+            ctx.quadraticCurveTo(285, 200, 260, 205);
+            ctx.closePath();
+            ctx.fillStyle = '#FF6FA3';
+            ctx.fill();
+            ctx.strokeStyle = '#7A1F3A';
+            ctx.stroke();
+
+            // Eye
+            ctx.beginPath();
+            ctx.arc(295, 185, 7, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(295, 185, 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+
+            // Spikes along the back - pale pink accents
+            var spikes = [
+                { x: 118, y: 205 },
+                { x: 140, y: 190 },
+                { x: 162, y: 180 },
+                { x: 188, y: 175 },
+                { x: 212, y: 180 }
+            ];
+            ctx.fillStyle = '#FFD6EB';
+            ctx.strokeStyle = '#FF9AC9';
+            spikes.forEach(function (s) {
+                ctx.beginPath();
+                ctx.moveTo(s.x, s.y);
+                ctx.lineTo(s.x + 10, s.y - 20);
+                ctx.lineTo(s.x + 20, s.y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // small nostril - dark pink
+            ctx.beginPath();
+            ctx.arc(304, 182, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#7A1F3A';
+            ctx.fill();
+        }
+
+        // Draw UT image as a faint background then draw dino on top
+        UTimage.onload = function () {
+            // draw image scaled into canvas
+            ctx.globalAlpha = 0.25;
+            ctx.drawImage(UTimage, 0, 0, UTimage.width, UTimage.height, 0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1;
+            drawDino();
+        };
+
+        // If the image is already cached/loaded, call onload handler immediately
+        if (UTimage.complete && UTimage.naturalWidth !== 0) {
+            UTimage.onload();
+        } else {
+            // placeholder text until image loads
+            ctx.font = '16px Calibri';
+            ctx.fillStyle = 'black';
+            ctx.fillText('Original image will go here', 10, 20);
+        }
     </script>
 		
 	</p>
